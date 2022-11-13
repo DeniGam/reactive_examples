@@ -4,19 +4,14 @@ import rx.Observable;
 import rx.schedulers.Schedulers;
 
 import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class Example1 {
 
     public static void main(String[] args) {
 
-        final ExecutorService threadPoolExecutor = Executors.newFixedThreadPool(2);
-
 
         getKeyReader()
                 .filter(val -> !val.startsWith("_"))
-                .subscribeOn(Schedulers.from(threadPoolExecutor))
                 .observeOn(Schedulers.immediate())
                 .subscribe(val -> {
                     if (val.startsWith("wait")) {

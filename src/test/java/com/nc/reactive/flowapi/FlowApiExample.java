@@ -2,37 +2,35 @@ package com.nc.reactive.flowapi;
 
 import org.junit.Test;
 
-import java.util.List;
 import java.util.concurrent.Flow;
 import java.util.concurrent.SubmissionPublisher;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class FlowApiExample {
+public class FlowApiExample extends Common {
+
 
     @Test
     public void simpleSubscribe() throws InterruptedException {
-        System.out.println("Start test");
-        List<Object> elements = List.of(1, 2L, 0.1, "string", new Object(), 'c');
-        try (SubmissionPublisher<Object> publisher = new SubmissionPublisher<>()) {
-            publisher.subscribe(new ConsumerSubscriber<>(System.out::println));
-            elements.forEach(publisher::submit);
-            System.out.println("End test");
-        }
+        System.out.println("Start simpleSubscribe");
+        SubmissionPublisher<Object> publisher = new SubmissionPublisher<>();
+        publisher.subscribe(new ConsumerSubscriber<>(this::print));
+        data.forEach(publisher::submit);
+        System.out.println("End simpleSubscribe");
+
         Thread.sleep(1000);
     }
 
     @Test
     public void transform() throws InterruptedException {
-        System.out.println("Start test");
-        List<Object> elements = List.of(1, 2L, 0.1, "string", new Object(), 'c');
+        System.out.println("Start transform");
         SubmissionPublisher<Object> publisher = new SubmissionPublisher<>();
-        FunctionMapper<Object, String> mapper = new FunctionMapper<>(o -> o == null ? "null" : o.getClass().getSimpleName() + "\t:\t" + o);
+        FunctionMapper<Object, String> mapper = new FunctionMapper<>(this::toTypedString);
         publisher.subscribe(mapper);
-        mapper.subscribe(new ConsumerSubscriber<>(System.out::println));
-        elements.forEach(publisher::submit);
-        System.out.println("End test");
+        mapper.subscribe(new ConsumerSubscriber<>(this::print));
+        data.forEach(publisher::submit);
+        System.out.println("End transform");
         Thread.sleep(1000);
     }
 
@@ -40,20 +38,19 @@ public class FlowApiExample {
     @Test
     public void filter() throws InterruptedException {
 
-        System.out.println("Start test");
+        System.out.println("Start filter");
 
-        List<Object> elements = List.of(1, 2L, 0.1, "string", new Object(), 'c');
         SubmissionPublisher<Object> publisher = new SubmissionPublisher<>();
-        FunctionMapper<Object, String> mapper = new FunctionMapper<>(o -> o == null ? "null" : o.getClass().getSimpleName() + "\t:\t" + o);
-        Filter<Object> filter = new Filter<>(o -> !(o instanceof CharSequence));
+        FunctionMapper<Object, String> mapper = new FunctionMapper<>(this::toTypedString);
+        Filter<Object> filter = new Filter<>(this::filterStrings);
 
         publisher.subscribe(filter);
         filter.subscribe(mapper);
-        mapper.subscribe(new ConsumerSubscriber<>(System.out::println));
+        mapper.subscribe(new ConsumerSubscriber<>(this::print));
 
 
-        elements.forEach(publisher::submit);
-        System.out.println("End test");
+        data.forEach(publisher::submit);
+        System.out.println("End filter");
         Thread.sleep(1000);
     }
 
