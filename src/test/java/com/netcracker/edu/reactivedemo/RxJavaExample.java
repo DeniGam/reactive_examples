@@ -1,4 +1,4 @@
-package com.nc.reactive.flowapi;
+package com.netcracker.edu.reactivedemo;
 
 import org.junit.Before;
 import org.junit.Test;

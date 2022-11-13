@@ -1,0 +1,12 @@
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/demo
+    username: admin
+    password: admin
+  flyway:
+    url: jdbc:postgresql://localhost:5432/demo
+    user: ${spring.r2dbc.username}
+    password: ${spring.r2dbc.password}
+logging:
+  level:
+    root: debug
