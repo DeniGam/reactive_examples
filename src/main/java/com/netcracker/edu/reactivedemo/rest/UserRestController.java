@@ -1,6 +1,7 @@
 package com.netcracker.edu.reactivedemo.rest;
 
 import com.netcracker.edu.reactivedemo.dao.UserDto;
+import com.netcracker.edu.reactivedemo.mapper.ServiceMapper;
 import com.netcracker.edu.reactivedemo.mapper.UserMapper;
 import com.netcracker.edu.reactivedemo.repo.ServiceTypeRepository;
 import com.netcracker.edu.reactivedemo.repo.UserRepository;
@@ -14,6 +15,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -24,6 +26,8 @@ public class UserRestController {
     private final UserRepository repository;
 
     private final UserMapper userMapper;
+
+    private final ServiceMapper serviceMapper;
 
 
     private final ServiceTypeRepository serviceTypeRepository;
@@ -38,8 +42,13 @@ public class UserRestController {
     @GetMapping("/{id}")
     public Mono<ResponseEntity<UserDto>> getOneUser(@PathVariable("id") UUID id) {
         log.info("Get User{}", id);
-        return repository.findById(id)
-                .map(userMapper::toDto)
+        return repository.findById(id) //Get one user from DB
+                .map(userMapper::toDto) //Convert user entity to DTO
+                .flatMap(userDto ->
+                        serviceTypeRepository.getServiceTypeForUser(userDto.getId()) //get all services by user
+                                .map(serviceMapper::toDto) //Convert service to DTO
+                                .collect(Collectors.toCollection(userDto::getServices)) //collect services to collection in user DTO
+                                .thenReturn(userDto))
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }

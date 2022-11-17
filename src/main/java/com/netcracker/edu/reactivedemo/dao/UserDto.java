@@ -1,11 +1,14 @@
 package com.netcracker.edu.reactivedemo.dao;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -20,4 +23,7 @@ public class UserDto {
     private String lastName;
     private Date createdWhen;
     private Date updatedWhen;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @Builder.Default
+    private List<ServiceTypeDto> services = new ArrayList<>();
 }

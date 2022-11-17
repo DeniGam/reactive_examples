@@ -9,4 +9,4 @@ spring:
     password: ${spring.r2dbc.password}
 logging:
   level:
-    root: debug
+    root: info

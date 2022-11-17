@@ -36,13 +36,16 @@ public class RxJavaExample extends Common {
     }
 
     @Test
-    public void filter() {
+    public void filter() throws InterruptedException {
         System.out.println("Start filter");
         observable
                 .filter(this::filterStrings)
                 .map(this::toTypedString)
+//                .subscribeOn(Schedulers.newThread())
                 .subscribe(this::print);
         System.out.println("End filter");
+
+        Thread.sleep(1000);
     }
 
 
